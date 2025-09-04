@@ -6,8 +6,6 @@ from dotenv import load_dotenv
 
 from app.models.schemas import ParsedResume, Review, InterviewTopic
 
-# --- LangChain Imports ---
-# These replace the direct 'google.genai' imports
 try:
     from langchain_google_genai import ChatGoogleGenerativeAI
     from langchain_core.prompts import PromptTemplate

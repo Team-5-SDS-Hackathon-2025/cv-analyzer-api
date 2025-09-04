@@ -33,6 +33,10 @@ class ProjectItem(BaseModel):
     time_of_project: str = ""
 
 
+class AwardItem(BaseModel):
+    name: str = ""
+
+
 class ParsedResume(BaseModel):
     name: str = ""
     email: str = ""
@@ -43,6 +47,7 @@ class ParsedResume(BaseModel):
     projects: List[ProjectItem] = []
     education: List[Dict[str, Any]] = []
     certifications: List[str] = []
+    awards: List[AwardItem] = []
     languages: List[str] = []
     location: str = ""
 
