@@ -10,7 +10,10 @@ load_dotenv()
 
 from app.api import analyze as analyze_module
 
-app = FastAPI(title="CV Analysis Advisor")
+app = FastAPI(
+    title="CV Analysis Advisor",
+    description=""
+)
 
 app.include_router(analyze_module.router, prefix="/api")
 

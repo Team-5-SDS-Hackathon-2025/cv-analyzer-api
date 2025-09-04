@@ -6,3 +6,8 @@ requests
 python-multipart
 unstructured
 google-genai
+langchain
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+unstructured[pdf]
