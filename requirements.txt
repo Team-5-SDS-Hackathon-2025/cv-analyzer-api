@@ -4,10 +4,12 @@ pydantic>=1.10
 pytest>=7.0
 requests
 python-multipart
-unstructured
+unstructured~=0.18.14
 google-genai
 langchain
 python-jose[cryptography]
 passlib[bcrypt]
-python-dotenv
+python-dotenv~=1.1.0
 unstructured[pdf]
+langchain-core~=0.3.58
+starlette~=0.38.2
