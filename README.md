@@ -1,7 +1,6 @@
 # CV Analyzer API
 Xây dựng một ứng dụng web **MVP** cho phép người dùng **tải lên CV**, để hệ thống **tự động đánh giá** và **đề xuất câu hỏi phỏng vấn**.
 
----
 
 ## Công nghệ
 - **Frontend**: React, UI Library (e.g., MUI, Ant Design, Tailwind CSS)
@@ -12,7 +11,6 @@ Xây dựng một ứng dụng web **MVP** cho phép người dùng **tải lên
   - Framework để xây dựng các ứng dụng AI như chatbot, hệ thống **RAG (Retrieval-Augmented Generation)**, và các **AI agent** bằng code đơn giản.
 - **AI Model**: Gemini 2.5 Flash
 
----
 
 ## Workflow
 **LangChain** sẽ đóng gói nội dung CV và gửi cho **Gemini** cùng một **prompt** cụ thể.  
@@ -20,7 +18,7 @@ Xây dựng một ứng dụng web **MVP** cho phép người dùng **tải lên
 - Đánh giá CV  
 - Danh sách câu hỏi phỏng vấn đề xuất
 
----
+
 
 ## Core Flow
 
