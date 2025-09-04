@@ -67,7 +67,6 @@ def analyze_with_gemini(prompt_template_str: str, documents: str, task_type: str
         print(f"An error occurred during the LangChain call: {e}")
         return {"error": "An error occurred while communicating with the Gemini API via LangChain."}
 
-
 def _validate_parsed(parsed: Dict[str, Any], task_type: str) -> Dict[str, Any]:
     """Validate parsed JSON using Pydantic models according to task_type and normalize output."""
     try:
@@ -78,6 +77,14 @@ def _validate_parsed(parsed: Dict[str, Any], task_type: str) -> Dict[str, Any]:
 
         if task_type == "parse_resume":
             data = parsed.get("parsed_resume", parsed)
+            # Ensure any empty lists are converted to a default dict
+            if not isinstance(data.get("education", []), list):
+                data["education"] = []
+            if not isinstance(data.get("work_experience", []), list):
+                data["work_experience"] = []
+            if not isinstance(data.get("projects", []), list):
+                data["projects"] = []
+
             resume_obj = ParsedResume(**data)
             return {"parsed_resume": resume_obj.dict()}
 
@@ -90,5 +97,8 @@ def _validate_parsed(parsed: Dict[str, Any], task_type: str) -> Dict[str, Any]:
 
         return parsed
     except (ValidationError, ValueError) as e:
+        # Instead of crashing, return a dictionary with the error and the raw data.
+        print(f"Pydantic validation failed for task '{task_type}': {str(e)}")
         return {"error": f"Pydantic validation failed: {str(e)}", "raw_data": parsed}
+
 

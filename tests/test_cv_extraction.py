@@ -18,7 +18,7 @@ def test_analyze_cv_full_flow():
     It uploads a real CV and validates the structure of the comprehensive response.
     """
     # 1. Setup: Define the path to the test CV file
-    cv_path = os.path.join("tests", "data", "CV - Nguyễn Quốc Bảo - Java.pdf")
+    cv_path = os.path.join("tests", "data", "cv-example-1-1.pdf")
     assert os.path.exists(cv_path), f"Test CV file not found at {cv_path}"
 
     # 2. Execution: Send the file to the /api/analyze endpoint

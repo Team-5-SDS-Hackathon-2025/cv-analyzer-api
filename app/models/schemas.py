@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 
 
@@ -24,18 +24,21 @@ class WorkExperienceItem(BaseModel):
     company: str = ""
     position: str = ""
     duration: str = ""
+    role_description: str = ""
 
 
 class ProjectItem(BaseModel):
     name: str = ""
     description: str = ""
-    team_size: int = 1
+    team_size: Optional[int] = None
     time_of_project: str = ""
 
 
 class AwardItem(BaseModel):
     name: str = ""
 
+class CertificationItem(BaseModel):
+    name: str = ""
 
 class ParsedResume(BaseModel):
     name: str = ""
@@ -46,7 +49,7 @@ class ParsedResume(BaseModel):
     work_experience: List[WorkExperienceItem] = []
     projects: List[ProjectItem] = []
     education: List[Dict[str, Any]] = []
-    certifications: List[str] = []
+    certifications: List[CertificationItem] = []
     awards: List[AwardItem] = []
     languages: List[str] = []
     location: str = ""
