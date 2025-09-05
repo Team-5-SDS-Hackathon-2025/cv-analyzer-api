@@ -30,7 +30,6 @@ class WorkExperienceItem(BaseModel):
 class ProjectItem(BaseModel):
     name: str = ""
     description: str = ""
-    team_size: Optional[int] = None
     time_of_project: str = ""
 
 
