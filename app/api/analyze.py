@@ -5,8 +5,9 @@ from fastapi.responses import JSONResponse
 # Import the initial parsing function
 from app.core.extractor import extract_resume_data
 # Import the other AI components for the chain
-from app.ai.chain import CVReviewer, InterviewQuestionGenerator
+from app.ai.chain import CVDesignReviewer, CVReviewer, InterviewQuestionGenerator
 # Import the final, comprehensive response model
+from app.core.pdf_renderer import render_pdf_page_to_base64_image
 from app.models.schemas import AnalyzeResponse
 
 router = APIRouter()
@@ -31,6 +32,12 @@ async def analyze_resume(file: UploadFile = File(...)):
     _validate_file_type(file)
     content = await file.read()
 
+    # --- Pre-process file for both text and image analysis ---
+    base64_image = None
+    if file.filename.lower().endswith(".pdf"):
+        print("Rendering PDF to image for design analysis...")
+        base64_image = render_pdf_page_to_base64_image(content)
+
     # --- Step 1: Parse the CV ---
     # This calls the two-step process: unstructured -> Gemini parser
     print("Step 1: Parsing resume...")
@@ -49,6 +56,13 @@ async def analyze_resume(file: UploadFile = File(...)):
 
     # --- Step 2: Review the Parsed Data ---
     print("Step 2: Reviewing parsed data...")
+    design_review = {}
+    if base64_image:
+        print("Step 4: Analyzing CV design from image...")
+        design_reviewer = CVDesignReviewer()
+        design_review_result = design_reviewer.analyze(base64_image)
+        design_review = design_review_result.get("design_review", {})
+        
     reviewer = CVReviewer()
     review_result = reviewer.analyze(structured_resume_json)
     review = review_result.get("review", {})
@@ -64,6 +78,7 @@ async def analyze_resume(file: UploadFile = File(...)):
     # --- Step 4: Combine and Return ---
     final_result = {
         "parsed_resume": parsed_resume,
+        "design_review": design_review,
         "review": review,
         "interviewQuestions": interview_questions
     }
