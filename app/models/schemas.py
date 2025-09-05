@@ -53,8 +53,26 @@ class ParsedResume(BaseModel):
     languages: List[str] = []
     location: str = ""
 
+class DesignCriterion(BaseModel):
+    # Changed from int to float to accept more nuanced scores from the AI
+    score: float
+    justification: str
+
+
+class DesignReviewSummary(BaseModel):
+    overall_score: float
+    strengths: List[str]
+    suggestions: List[str]
+
+
+
+class DesignReview(BaseModel):
+    """The main model for the complete design and layout analysis."""
+    criteria: Dict[str, DesignCriterion]
+    summary: DesignReviewSummary
 
 class AnalyzeResponse(BaseModel):
+    design_review: Optional[DesignReview] = None
     review: Review
     interviewQuestions: List[InterviewTopic]
     parsed_resume: ParsedResume

@@ -1,54 +1,80 @@
-from typing import Dict
+from typing import Dict, Optional
 
-from app.ai.gemini_client import analyze_with_gemini
-from app.ai.prompts import CV_REVIEWER_PROMPT, INTERVIEW_QUESTION_PROMPT, RESUME_PARSER_PROMPT
+# Import the new multimodal client function and the new prompt
+from app.ai.gemini_client import analyze_with_gemini, analyze_with_gemini_multimodal
+from app.ai.prompts import CV_REVIEWER_PROMPT, INTERVIEW_QUESTION_PROMPT, RESUME_PARSER_PROMPT, DESIGN_REVIEWER_PROMPT
 
 
 class ResumeParser:
     """Use AI (Gemini) to convert extracted CV text to structured JSON resume fields."""
 
-    def get_prompt_template(self) -> str:
-        # Note the "{documents}" placeholder for LangChain.
-        # All literal curly braces in the example output are now escaped with double braces {{ }}.
-        return RESUME_PARSER_PROMPT
-
     def analyze(self, text: str) -> Dict:
-        prompt_template = self.get_prompt_template()
-        return analyze_with_gemini(prompt_template, text, task_type="parse_resume")
-
+        # Use the prompt template string directly
+        return analyze_with_gemini(RESUME_PARSER_PROMPT, text, task_type="parse_resume")
 
 
 class CVReviewer:
-    """Produce a review summary (score, strengths, weaknesses, suggestions)."""
-
-    def get_prompt_template(self) -> str:
-        return CV_REVIEWER_PROMPT
+    """Produce a review summary (score, strengths, weaknesses, suggestions) from text."""
 
     def analyze(self, text: str) -> Dict:
-        prompt_template = self.get_prompt_template()
-        return analyze_with_gemini(prompt_template, text, task_type="review")
+        return analyze_with_gemini(CV_REVIEWER_PROMPT, text, task_type="review")
 
 
 class InterviewQuestionGenerator:
-    """Generate interview topics and questions based on the CV."""
-
-    def get_prompt_template(self) -> str:
-        return INTERVIEW_QUESTION_PROMPT
+    """Generate interview topics and questions based on the CV text."""
 
     def analyze(self, text: str) -> Dict:
-        prompt_template = self.get_prompt_template()
-        return analyze_with_gemini(prompt_template, text, task_type="interview")
+        return analyze_with_gemini(INTERVIEW_QUESTION_PROMPT, text, task_type="interview")
 
 
+# --- New Class for Design Review ---
+class CVDesignReviewer:
+    """Analyzes the visual design of a CV from an image."""
 
-def analyze_cv_chain(text: str) -> Dict:
+    def analyze(self, base64_image: str) -> Dict:
+        """
+        Analyzes the CV's design using a multimodal AI call.
+
+        Args:
+            base64_image: A base64 encoded string of the CV's image.
+
+        Returns:
+            A dictionary containing the structured design review.
+        """
+        # This calls a new, specialized function in the gemini_client that handles images.
+        return analyze_with_gemini_multimodal(DESIGN_REVIEWER_PROMPT, base64_image, task_type="design_review")
+
+
+# --- Updated Orchestration Function ---
+def analyze_cv_chain(text: str, base64_image: Optional[str] = None) -> Dict:
+    """
+    Orchestrates the full analysis pipeline, now including an optional design review.
+    """
     parser = ResumeParser()
-    parsed = parser.analyze(text).get("parsed_resume", {})
+    parsed_result = parser.analyze(text)
+    parsed_resume = parsed_result.get("parsed_resume", {})
 
     reviewer = CVReviewer()
-    review = reviewer.analyze(text).get("review", {})
+    review_result = reviewer.analyze(text)
+    review = review_result.get("review", {})
 
     generator = InterviewQuestionGenerator()
-    interview = generator.analyze(text).get("interviewQuestions", [])
+    interview_result = generator.analyze(text)
+    interview_questions = interview_result.get("interviewQuestions", [])
 
-    return {"parsed_resume": parsed, "review": review, "interviewQuestions": interview}
+    # --- New Design Review Step ---
+    design_review = {}
+    if base64_image:
+        print("Step 4: Analyzing CV design from image...")
+        design_reviewer = CVDesignReviewer()
+        design_review_result = design_reviewer.analyze(base64_image)
+        design_review = design_review_result.get("design_review", {})
+        print("Step 4: Success.")
+    
+    return {
+        "parsed_resume": parsed_resume,
+        "review": review,
+        "interviewQuestions": interview_questions,
+        "design_review": design_review
+    }
+
